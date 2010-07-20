@@ -68,7 +68,7 @@ Engineering}
 \item Many P2P applications are widely used.
 \item Gnutella, Bittorrent, and Skype are developed from the scratch.
 \item No P2P abstraction or framework exist.
-\item P2P has not made a very large impact in system design.
+\item From the view of system design, building P2P system is difficult.
 \end{itemize}
 \end{frame}
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
@@ -108,17 +108,17 @@ Engineering}
 \item<1> Network Size Estimation
 \begin{itemize}
 \item Hard to maintain global network information in P2P systems
-\item More accurate but less cost estimation is always preferred. 
+\item More accurate but less costly estimation is always preferred. 
 \end{itemize}
 \item<2> Efficient Unstructured Search
 \begin{itemize}
-\item Be optimal in terms of trade-off in query and cache costs
-\item Complex queries are supported?
+\item Be optimal in terms of trade-off in query and cache costs.
+\item Support Complex queries.
 \end{itemize}
 \item<3> Reusable Search Module On Real System
 \begin{itemize}
 \item Do programmers need to build entire system every time?
-\item Minimize developing and deploying new P2P software(use existing P2P topologies)
+\item We want to minimize developing and deploying new P2P software(use existing P2P topologies)
 \end{itemize}
 \item<4-> Search for P2P DB
 \begin{itemize}
@@ -183,15 +183,15 @@ Engineering}
 \begin{frame}
 \frametitle{Problem Statement}
 \begin{itemize}
-\item How many people in this room?
-\item Why do you think that?
-\singlespacing
-\item How many people in this campus?
-\item Can you count them all?
-\singlespacing
-\item How many nodes in a P2P network?
+\item Global information is not available in distritued systems
 \item The System Monitoring and obtaining global statistics
 become much more complex.
+\item Network size is important to some applications.
+\begin{itemize}
+\item set time-to-live for a query packet
+\item determine search range
+\item limit number of users in a special group
+\end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -199,14 +199,14 @@ become much more complex.
 \begin{frame}
 \frametitle{Network size estimation}
 \begin{itemize}
-\item Network Size
+\item Network Size is needed for:
 \begin{itemize}
 \item Load balancing
 \item Restricted broadcasting 
 \item Determining network parameters
 \end{itemize}
-\item Unstructured P2P network: broadcasting, random walks
-\item Structured P2P network: density of identifiers.
+\item Unstructured P2P techniques: broadcasting, random walks
+\item Structured P2P techniques: density of identifiers.
 \end{itemize}
 \end{frame}
 
@@ -285,7 +285,7 @@ D = \frac{n_{AB}}{l_{AB}}
 \item Use bounded broadcasting
 \begin{itemize}
 \item Pick a random starting node, $n_{start}$
-\item Set a range [$n_{start}$, $n_{start}+\sqrt{N_0}$]
+\item Set a range with the size of $\sqrt{\alpha N_0}$ ($\alpha$ is a replication factor.
 \item Start broadcasting in the range
 \item Count the number of nodes in the range
 \end{itemize}
@@ -315,7 +315,7 @@ D = \frac{n_{AB}}{l_{AB}}
 \end{frame}
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Node Join}
+\frametitle{Node Join to maximize node distance}
 \begin{itemize}
 \item Two possible places for join 
 \item Select the place with bigger gap between two nodes
@@ -359,6 +359,9 @@ D = \frac{n_{AB}}{l_{AB}}
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Simulation Result: MSE vs. Cost}
+\begin{itemize}
+\item MSE(\=X)=E((\=X-X)$^{2}$), \=X:sample average and X:actual value  
+\end{itemize}
 \begin{figure}
 \centering
 \includegraphics[width=2.5in,angle=270]{figs/cost_mse1}
@@ -368,9 +371,9 @@ D = \frac{n_{AB}}{l_{AB}}
 \begin{frame}
 \frametitle{Contribution}
 \begin{itemize}
-\item Each method achieves various accuracy and cost.
+\item Each method achieves various accuracy(mean, stdv) and cost.
 \item A user can select one or more combined methods to meet user's desired performance.
-\item Introduce node join algorithm to make a network more uniformly distributed.
+\item To select an address from multiple candidates make a network more uniformly distributed.
 \end{itemize}
 \end{frame}
 
@@ -577,30 +580,67 @@ Avoid massive message production
 \begin{frame}
 \frametitle{Analysis: Success Rate}
 \small{
-\only<1->{
-\begin{eqnarray*}
-%1-P_{s} = \prod_{i=0}^{m-1}(1-p)^{c_{i}q_{i}}
-1-P_{s} = \prod_{A}(1-p)
-\end{eqnarray*}
+\begin{eqnarray}
+P_{miss} &=& \frac{{{N-Q}\choose{C}}}{{{N}\choose{C}}}\\
+         &=& \frac{(N-Q)!}{N!}\frac{(N-C)!}{(N-C-Q)!}
+\end{eqnarray}
 }
-\uncover<2->{
-Then, since area \textit{A} has \textit{CQ} bins,
-\begin{eqnarray*}
-1-P_{s} = (1-p)^{CQ}%, where p=\frac{N}{B}
-\end{eqnarray*}
-}
-\uncover<3->{
-where $CQ$ = $\alpha$ $\frac{B}{N}$ and $p = \frac{N}{B}$
-\begin{eqnarray*}%\label{th}
-1-P_{s} = (1-\frac{N}{B})^{\alpha (\frac{B}{N})}
-\end{eqnarray*}
-}
-\uncover<4->{
-\begin{eqnarray*}%\label{th}
-P_{s} \geq 1-e^{-\alpha} \ \ if \ \ \frac{B}{N} \rightarrow \infty 
-\end{eqnarray*}
-}
-}
+\end{frame}
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\begin{itemize}
+\item case 0: If $Q=0$ and $C=0$, $P_{miss}=1$.
+\item case 1: If $Q+C>N$, $P_{miss}=0$.
+\item case 2: If $Q+C=N$, $P_{miss}=\frac{1}{{{N}\choose{C}}}$. 
+since $N \leq {{N}\choose{C}} \leq 2^{-N}$ for $C\geq 1$,  
+\begin{equation}
+2^{-N} \leq P_{miss} \leq \frac{1}{N}
+\end{equation}
+\item case 3: Q+C+E=N, where $E\geq1$. In this case, at least one bin is not 
+occupied or searched.
+I use Sterling's bounds to analyze the bounds for this case:
+\begin{equation}
+e^{-\frac{1}{12n+1}} < \frac{n!}{\sqrt{2\pi n}n^n e^{-n}} < e^{-\frac{1}{12n}}
+\end{equation}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+Sterling's bounds is used to analyze the bounds for case 3:
+\begin{equation}
+e^{-\frac{1}{12n+1}} < \frac{n!}{\sqrt{2\pi n}n^n e^{-n}} < e^{-\frac{1}{12n}}
+\end{equation}
+\end{frame}
+
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Upper Bound}
+\begin{eqnarray}
+P_{miss} &<&e^{-\frac{QC}{N}} \sqrt{1+\frac{QC}{NE}} e^{\frac{1}{12E+1}}\\
+         &<& e^{-\alpha}\sqrt{1+\alpha/E}e^{\frac{1}{12E+1}}
+\end{eqnarray}
+, when I set C and Q such that $CQ = \alpha B/N$.
+\end{frame}
+
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Lower Bound}
+\begin{eqnarray}
+P_{miss} &>& \left(1-\frac{C}{N}\right)^Q\left(1-\frac{Q}{N}\right)^C \sqrt{1+\frac{QC}{NE}} e^{-\frac{1}{12E}}\\
+         &>& (1+\alpha/E)\left(1-\frac{\alpha}{Q}\right)^Q \left(1-\frac{\alpha}{C}\right)^C \sqrt{1+\frac{\alpha}{E}} e^{-\frac{1}{12E}}
+\end{eqnarray}
+$P_{miss} \rightarrow 1$ as $\alpha \rightarrow 0$.
+\end{frame}
+
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Success Probability}
+\begin{itemize}
+\item When $E$ is large (large address space and non-negligible caching),
+$P_{miss} \approx e^{\alpha}$.
+\item Success Probability is a function of $\alpha$, independent of $N$.
+\end{itemize}
 \end{frame}
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
@@ -761,15 +801,13 @@ Deetoo can be a good search tool for P2P networks.
 \begin{frame}
 \frametitle{Cache Map Function}
 \begin{algorithmic}[1]
-\STATE $o \leftarrow object$     \COMMENT{an object to be searched}
-\STATE $object\_list$ %\COMMENT{a list of objects for this node}
-\STATE $success = \FALSE$ %\COMMENT{result of cache success/fail}
-\STATE $result$
-\IF{$o$ finds a match in $object\_list$}
-  \STATE $result \leftarrow matching\_object$
-  \RETURN $result$
+\REQUIRE $object~ o$     \COMMENT{an object to be searched}
+\REQUIRE $Node~ n$
+\STATE $object\_list \leftarrow n.getObjects()$ %\COMMENT{a list of objects for this node}
+\IF{$o$ is not in $object\_list$}
+  \RETURN \TRUE
 \ELSE
-  \RETURN $NULL$
+  \RETURN \FALSE
 \ENDIF
 \end{algorithmic}
 \end{frame}
@@ -778,37 +816,37 @@ Deetoo can be a good search tool for P2P networks.
 \begin{frame}
 \frametitle{Query Map Function}
 \begin{algorithmic}[1]
-\STATE $o \leftarrow object$     \COMMENT{an object to be searched}
-\STATE $object\_list$ %\COMMENT{a list of objects for this node}
-\STATE $success = \FALSE$ %\COMMENT{result of cache success/fail}
-\STATE $result$
-\IF{$o$ finds a match in $object\_list$}
-  \STATE $result \leftarrow matching\_object$
-  \RETURN $result$
-\ELSE
-  \RETURN $NULL$
-\ENDIF
+\REQUIRE $object~ o$     \COMMENT{an object to be searched}
+\REQUIRE $Node~ n$
+\STATE $object\_list \leftarrow n.getObjects()$ %\COMMENT{a list of objects for this node}
+\FORALL {$v \in object\_list$}
+  \IF{$o$ matches $v$}
+    \STATE $result.Add(v)$
+  \ENDIF
+\ENDFOR
+\RETURN $result$
 \end{algorithmic}
 \end{frame}
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Cache Reduce Function}
-\begin{algorithmic}[1]
-\STATE $child\_result \leftarrow [\FALSE, \TRUE,..,\TRUE]$ \COMMENT{results from children as a list}
-\STATE $map\_result \leftarrow \TRUE/\FALSE$ \COMMENT{result from Map function}
-\STATE $result$
-\IF{$child\_result$ is NULL}
-  \STATE $result \leftarrow map\_result$
-\ELSIF {$map\_result$ is NULL}
-  \STATE $result \leftarrow child\_result$
-\ELSE
-  \STATE add $map\_result$ to $result$
-  \STATE add $child\_result$ to $result$
-\ENDIF
-\RETURN $result$
-\end{algorithmic}
-\end{frame}
+%\begin{frame}
+%\frametitle{Reduce Function}
+%
+%\end{frame}
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{Cache Reduce Function}
+%\begin{algorithmic}[1]
+%\REQUIRE Key $k$, Value Set $V$
+%\COMMENT{Key: node id}
+%\COMMENT{Value Set: list of bool(success/fail)}
+%\STATE $result \leftarrow [ ] \COMMENT{empty list}
+%\FORALL $v\in V$
+%  \STATE $result.Add(v)$
+%\ENDFOR  
+%\RETURN $result$
+%\end{algorithmic}
+%\end{frame}
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
@@ -851,7 +889,7 @@ Deetoo can be a good search tool for P2P networks.
 \begin{frame}
 \frametitle{Results: Cost}
 \begin{itemize}
-\item 
+\item Query packet: 384Byte, 8KB for $\alpha=1$, 13.4KB for $\alpha=3$
 \end{itemize}
 \begin{center}
 \includegraphics[scale=0.4]{figs/plab_cost.eps}
@@ -860,9 +898,10 @@ Deetoo can be a good search tool for P2P networks.
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Results: Search Time}
+\frametitle{Results: Latency}
 \begin{itemize}
-\item 
+\item per-hop latency: 0.45sec, 2.29sec for $\alpha=1$, 2.71sec for $\alpha=3$
+\item In case of sequeuntial message relay: 9.42sec($\alpha=1$), 14.78sec($\alpha=3$)
 \end{itemize}
 \begin{center}
 \includegraphics[scale=0.4]{figs/plab_depth.eps}
@@ -872,9 +911,6 @@ Deetoo can be a good search tool for P2P networks.
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Results: Network Size Estimation}
-\begin{itemize}
-\item 
-\end{itemize}
 \begin{center}
 \includegraphics[scale=0.4]{figs/plab_size.eps}
 \end{center}
@@ -885,8 +921,9 @@ Deetoo can be a good search tool for P2P networks.
 \frametitle{Conclusion}
 \begin{itemize}
 \item Deetoo is implemented on real system.
-\item Build reusable search function.
-\item Comparable results to the theory.
+\item A reusable search function is built.
+\item Measured results match the theory.
+\item Deetoo code is available at http://github.com/twchoi/brunet.
 \end{itemize}
 \end{frame}
 
@@ -898,7 +935,10 @@ Deetoo can be a good search tool for P2P networks.
 \begin{frame}
 \frametitle{Exact Deetoo: The Motivation}
 \begin{itemize}
-\item Deetoo achieves constant hit rate.
+\item Deetoo achieves constant hit rate independent of network size.
+\item By increasing a replication factor, hit rate can be reached over 90\%.($\alpha > 2.4$)
+\item Deetoo is flexible and applicable to many P2P applications.
+\item Some applications, such as distributed database, expect to find a match if it is already in the system. 
 \item How can Deetoo achieve 100\% hit rate without paying more cost?
 \end{itemize}
 \end{frame}
@@ -909,7 +949,7 @@ Deetoo can be a good search tool for P2P networks.
 \begin{itemize}
 \item To achieve 100\% hit rate, at least a node must reside in 
 a intersection of address space.
-\item A \textit{BOX} is introduced
+\item A \textit{BOX} is introduced.
 \item In a join process, a new node finds a box with minimum number of nodes.
 \item Split/Merge is executed to maintain the maximum and the minimum number of nodes in boxes.
 \end{itemize}
@@ -942,13 +982,6 @@ whose boundary includes the address.
 \end{enumerate}
 \end{frame}
 
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Join}
-\begin{center}
-\includegraphics[scale=0.15]{figs/ed2_join.eps}
-\end{center}
-\end{frame}
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
@@ -979,31 +1012,19 @@ whose boundary includes the address.
 \end{itemize}
 \end{frame}
 
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Trad-off Cache/Query Costs}
-\begin{center}
-\includegraphics[scale=0.13]{figs/asym_both.eps}
-\end{center}
-\end{frame}
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-%\begin{frame}
-%\frametitle{Leave, Merge, Stabilization}
-%\begin{itemize}
-%\item Leave
-%\item Merge
-%\item Stabilization
-%\end{itemize}
-%\end{frame}
+
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Results: Number of Boxes}
+\begin{itemize}
+\item upper\_bound: $N/m$, lower\_bound: $N/M$
+\end{itemize}
 \begin{figure}
 \begin{minipage}{5cm}
 \centering
 \includegraphics[width=2.2in]{figs/no_box_100k.eps}
-\caption{With bonds} 
+\caption{With bounds} 
 \end{minipage}
 \begin{minipage}{5cm}
 \centering
@@ -1042,7 +1063,7 @@ whose boundary includes the address.
 \begin{minipage}{5cm}
 \centering
 \includegraphics[width=2.2in]{figs/join_cost_100k.eps}
-\caption{Average}
+\caption{Cumulative Average}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1050,6 +1071,9 @@ whose boundary includes the address.
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Results:Communication Cost}
+\begin{eqnarray}
+m\sqrt{\frac{N}{M}} \leq K_c \leq M\sqrt{\frac{N}{m}}
+\end{eqnarray}
 \begin{figure}
 \begin{minipage}{5cm}
 \centering
@@ -1067,16 +1091,19 @@ whose boundary includes the address.
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Results: Number of Replication}
+\begin{equation}
+\tilde m = \frac{K_c m}{N}
+\end{equation}
 \begin{figure}
 \begin{minipage}{5cm}
 \centering
 \includegraphics[width=2.2in]{figs/rep_obj_20k.eps}
-\caption{20,000 nodes} 
+\caption{`filling boxes'} 
 \end{minipage}
 \begin{minipage}{5cm}
 \centering
 \includegraphics[width=2.2in]{figs/rep_obj_50k.eps}
-\caption{50,000 nodes}
+\caption{`splitting'}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1084,16 +1111,19 @@ whose boundary includes the address.
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Results: Number of Objects per Node}
+\begin{equation}
+K_c=w\tilde N_{box}
+\end{equation}
 \begin{figure}
 \begin{minipage}{5cm}
 \centering
 \includegraphics[width=2.2in]{figs/obj_node_20k.eps}
-\caption{20,000 nodes} 
+\caption{`filling boxes'} 
 \end{minipage}
 \begin{minipage}{5cm}
 \centering
 \includegraphics[width=2.2in]{figs/obj_node_50k.eps}
-\caption{50,000 nodes}
+\caption{`splitting'}
 \end{minipage}
 \end{figure}
 \end{frame}
@@ -1113,7 +1143,10 @@ whose boundary includes the address.
 \item Exact Deetoo resolves queries without a miss.
 \item Communication cost is still $O(\sqrt{N})$.
 \item Exact Deetoo supports any type of query.
-\item Exact Deetoo will be applicable to many existing P2P systems
+\item Exact Deetoo will be applicable to many existing P2P systems.
+\begin{itemize}
+\item ex) distributed DataBase systems
+\end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -1142,5 +1175,30 @@ whose boundary includes the address.
 \end{center}
 \end{frame}
 
- 
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Join}
+\begin{center}
+\includegraphics[scale=0.15]{figs/ed2_join.eps}
+\end{center}
+\end{frame}
+ %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Trade-off Cache/Query Costs}
+\begin{itemize}
+\item if $\frac{w_r}{w_c} > k$, split a rwo in half, else if $\frac{w_r}{w_c} < k$, if $w_c=w_r$, split algorithm selects a row or a column randomly.
+\end{itemize}
+\begin{center}
+\includegraphics[scale=0.12]{figs/asym_both.eps}
+\end{center}
+\end{frame}
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{Leave, Merge, Stabilization}
+%\begin{itemize}
+%\item Leave
+%\item Merge
+%\item Stabilization
+%\end{itemize}
+%\end{frame}
 \end{document}
