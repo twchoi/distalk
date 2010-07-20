@@ -188,27 +188,29 @@ Engineering}
 become much more complex.
 \item Network size is important to some applications.
 \begin{itemize}
-\item set time-to-live for a query packet
-\item determine search range
+\item set time-to-live for a query packet, determine search range
 \item limit number of users in a special group
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Network size estimation}
-\begin{itemize}
-\item Network Size is needed for:
-\begin{itemize}
-\item Load balancing
-\item Restricted broadcasting 
-\item Determining network parameters
+\item load balancing
 \end{itemize}
 \item Unstructured P2P techniques: broadcasting, random walks
 \item Structured P2P techniques: density of identifiers.
 \end{itemize}
 \end{frame}
+
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{Network size estimation}
+%\begin{itemize}
+%\item Network Size is needed for:
+%\begin{itemize}
+%\item Load balancing
+%\item Restricted broadcasting 
+%\item Determining network parameters
+%\end{itemize}
+%\item Unstructured P2P techniques: broadcasting, random walks
+%\item Structured P2P techniques: density of identifiers.
+%\end{itemize}
+%\end{frame}
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \iffalse
@@ -628,6 +630,9 @@ $P_{miss} \approx e^{\alpha}$.
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Analysis: Communication Cost}
+\begin{center}
+$\sqrt{N}$
+\end{center}
 \center
 \includegraphics[scale=0.25]{figs/cost_area}
 
