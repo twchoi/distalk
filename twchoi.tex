@@ -260,7 +260,7 @@ D = \frac{n_{AB}}{l_{AB}}
 \item Calculate distance to $\log{N_0}$-hop-away node($d_{log}$).
 \item $N_0$ is pre-calculated by the \textbf{nearest estimation}
 \item $D = \frac{\log{N_0}}{d_{log}}$
-\item $\log{N_0}$ communication cost
+\item $\log{N_0}$ communication cost (same as DHT')
 \end{itemize}
 \end{frame}
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
@@ -289,30 +289,13 @@ D = \frac{n_{AB}}{l_{AB}}
 \item Start broadcasting in the range
 \item Count the number of nodes in the range
 \end{itemize}
-\item Broadcasting is bounded by $\sqrt{N_0}$
+%\item Broadcasting is bounded by $\sqrt{N_0}$
 \item Communication cost is approximately $\sqrt{N_0}$ 
+\item This method can be piggybacked on cache/query message
 \end{itemize}
 \end{frame}
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Node Distribution}
-\begin{itemize}
-\item Nodes in real network are not uniformly distributed. 
-\end{itemize}
-\begin{figure}
-\begin{minipage}{5cm}
-\centering
-\includegraphics[width=2.0in]{figs/myth}
-\caption{Myth} 
-\end{minipage}
-\begin{minipage}{5cm}
-\centering
-\includegraphics[width=2.0in]{figs/real}
-\caption{Real}
-\end{minipage}
-\end{figure}
 
-\end{frame}
+
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Node Join to maximize node distance}
@@ -566,7 +549,7 @@ Avoid massive message production
 \begin{frame}
 \frametitle{Notations}
 \begin{itemize}
-\item $P_s$: success rate
+\item $P_{miss}$: success rate
 %\item $p$: the probability that a bin is occupied ($p = \frac{N}{B}$)
 \item $p$: the probability that a bin is occupied
 \item $C$: number of columns for caching
@@ -761,22 +744,22 @@ Deetoo can be a good search tool for P2P networks.
 \end{center}
 \end{frame}
 
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Network Size Estimator}
-\begin{itemize}
-\item $N_0$: nearest estimation
-\item $N_1$: log estimation
-\item $N_2$: median estimation
-\end{itemize}
-\end{frame}
+%%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{Network Size Estimator}
+%\begin{itemize}
+%\item $N_0$: nearest estimation
+%\item $N_1$: log estimation
+%\item $N_2$: median estimation
+%\end{itemize}
+%\end{frame}
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{MapReduce Modules}
 \begin{itemize}
-\item parallel computation 
-\item user needs to define map and reduce functions
+\item Parallel computation 
+\item User needs to define map and reduce functions.
 \item Functional modules: P2P network, MapReduce Core, Generate Tree, Map, Reduce
 \end{itemize}
 \end{frame}
@@ -819,6 +802,7 @@ Deetoo can be a good search tool for P2P networks.
 \REQUIRE $object~ o$     \COMMENT{an object to be searched}
 \REQUIRE $Node~ n$
 \STATE $object\_list \leftarrow n.getObjects()$ %\COMMENT{a list of objects for this node}
+\STATE $result = [~]$
 \FORALL {$v \in object\_list$}
   \IF{$o$ matches $v$}
     \STATE $result.Add(v)$
@@ -830,42 +814,44 @@ Deetoo can be a good search tool for P2P networks.
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 %\begin{frame}
-%\frametitle{Reduce Function}
-%
+
 %\end{frame}
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-%\begin{frame}
-%\frametitle{Cache Reduce Function}
-%\begin{algorithmic}[1]
-%\REQUIRE Key $k$, Value Set $V$
+%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Reduce Function}
+\begin{algorithmic}[1]
+\REQUIRE Key $k$, Value Set $V$
+%
 %\COMMENT{Key: node id}
+%
 %\COMMENT{Value Set: list of bool(success/fail)}
-%\STATE $result \leftarrow [ ] \COMMENT{empty list}
-%\FORALL $v\in V$
-%  \STATE $result.Add(v)$
-%\ENDFOR  
+\STATE $result\_list \leftarrow n.getResults()$ \COMMENT{empty list}
+%\IF {$k==n$}
+\FORALL {$v\in V$}
+  \STATE $result\_list.Add(v)$
+\ENDFOR  
+\RETURN $result\_list$
+\end{algorithmic}
+\end{frame}
+
+%%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{Query Reduce Function}
+%\begin{algorithmic}[1]
+%\STATE $child\_result \leftarrow list\ of\ matching\ objects$ \COMMENT{results from children as a list}
+%\STATE $map\_result \leftarrow a\ matching\ object$ \COMMENT{result from Map function}
+%\STATE $result$
+%\IF{$child\_result$ is NULL}
+%  \STATE $result \leftarrow map\_result$
+%\ELSIF {$map\_result$ is NULL}
+%  \STATE $result \leftarrow child\_result$
+%\ELSE
+%  \STATE add $map\_result$ to $result$
+%  \STATE add $child\_result$ to $result$
+%\ENDIF
 %\RETURN $result$
 %\end{algorithmic}
 %\end{frame}
-
-%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Query Reduce Function}
-\begin{algorithmic}[1]
-\STATE $child\_result \leftarrow list\ of\ matching\ objects$ \COMMENT{results from children as a list}
-\STATE $map\_result \leftarrow a\ matching\ object$ \COMMENT{result from Map function}
-\STATE $result$
-\IF{$child\_result$ is NULL}
-  \STATE $result \leftarrow map\_result$
-\ELSIF {$map\_result$ is NULL}
-  \STATE $result \leftarrow child\_result$
-\ELSE
-  \STATE add $map\_result$ to $result$
-  \STATE add $child\_result$ to $result$
-\ENDIF
-\RETURN $result$
-\end{algorithmic}
-\end{frame}
 
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
@@ -1141,6 +1127,7 @@ K_c=w\tilde N_{box}
 \frametitle{Contribution}
 \begin{itemize}
 \item Exact Deetoo resolves queries without a miss.
+\item There is a trade-off between join cost and exact query response.
 \item Communication cost is still $O(\sqrt{N})$.
 \item Exact Deetoo supports any type of query.
 \item Exact Deetoo will be applicable to many existing P2P systems.
@@ -1175,6 +1162,25 @@ K_c=w\tilde N_{box}
 \end{center}
 \end{frame}
 
+%%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Node Distribution}
+\begin{itemize}
+\item Nodes in real network are not uniformly distributed. 
+\end{itemize}
+\begin{figure}
+\begin{minipage}{5cm}
+\centering
+\includegraphics[width=2.0in]{figs/myth}
+\caption{Myth} 
+\end{minipage}
+\begin{minipage}{5cm}
+\centering
+\includegraphics[width=2.0in]{figs/real}
+\caption{Real}
+\end{minipage}
+\end{figure}
+\end{frame}
 %%%%%%%%% SLIDE %%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Join}
